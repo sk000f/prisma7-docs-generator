@@ -18,16 +18,11 @@ describe('DataDictionaryGenerator', () => {
 
     expect(dict.data.models).toHaveLength(1);
     const [user] = dict.data.models;
-    expect(user.logicalName).toBe('User');
-    expect(user.physicalName).toBe('User');
-    expect(user.hasPhysicalName).toBe(false);
-    expect(user.fields.map((f) => ({ l: f.logicalName, p: f.physicalName }))).toEqual([
-      { l: 'id', p: 'id' },
-      { l: 'email', p: 'email' },
-    ]);
+    expect(user.name).toBe('User');
+    expect(user.fields.map((f) => f.name)).toEqual(['id', 'email']);
   });
 
-  it('surfaces @@map as a distinct physical table name', async () => {
+  it('uses @@map as the physical table name', async () => {
     const datamodel = /* Prisma */ `
       model Post {
         id    String @id @default(cuid())
@@ -42,17 +37,14 @@ describe('DataDictionaryGenerator', () => {
     );
 
     const [post] = dict.data.models;
-    expect(post.logicalName).toBe('Post');
-    expect(post.physicalName).toBe('posts');
-    expect(post.hasPhysicalName).toBe(true);
+    expect(post.name).toBe('posts');
 
-    // The HTML output should surface both names next to the heading.
     const html = dict.toHTML();
-    expect(html).toContain('id="dict-Post"');
-    expect(html).toContain('posts');
+    expect(html).toContain('id="dict-posts"');
+    expect(html).not.toContain('id="dict-Post"'); // logical name should not appear as an anchor
   });
 
-  it('surfaces @map as a distinct physical column name', async () => {
+  it('uses @map as the physical column name', async () => {
     const datamodel = /* Prisma */ `
       model User {
         id        String   @id @default(cuid())
@@ -65,15 +57,12 @@ describe('DataDictionaryGenerator', () => {
       transformDMMF(dmmf, { includeRelationFields: true })
     );
 
-    const createdAt = dict.data.models[0].fields.find(
-      (f) => f.logicalName === 'createdAt'
-    );
-    expect(createdAt).toBeDefined();
-    expect(createdAt!.physicalName).toBe('created_at');
+    const fields = dict.data.models[0].fields.map((f) => f.name);
+    expect(fields).toEqual(['id', 'created_at']);
 
     const html = dict.toHTML();
-    expect(html).toContain('id="dict-User-createdAt"');
-    expect(html).toContain('created_at');
+    expect(html).toContain('id="dict-User-created_at"');
+    expect(html).not.toContain('id="dict-User-createdAt"'); // logical field name should not appear as an anchor
   });
 
   it('excludes relation fields when includeRelationFields is false', async () => {
@@ -94,11 +83,11 @@ describe('DataDictionaryGenerator', () => {
       transformDMMF(dmmf, { includeRelationFields: false })
     );
 
-    const user = dict.data.models.find((m) => m.logicalName === 'User')!;
-    const post = dict.data.models.find((m) => m.logicalName === 'Post')!;
+    const user = dict.data.models.find((m) => m.name === 'User')!;
+    const post = dict.data.models.find((m) => m.name === 'Post')!;
 
-    expect(user.fields.map((f) => f.logicalName)).toEqual(['id']);
-    expect(post.fields.map((f) => f.logicalName)).toEqual(['id', 'userId']);
+    expect(user.fields.map((f) => f.name)).toEqual(['id']);
+    expect(post.fields.map((f) => f.name)).toEqual(['id', 'userId']);
   });
 
   it('emits a top-level Data Dictionary heading anchor', async () => {
@@ -112,5 +101,26 @@ describe('DataDictionaryGenerator', () => {
       transformDMMF(dmmf, { includeRelationFields: true })
     );
     expect(dict.toHTML()).toContain('id="data-dictionary"');
+  });
+
+  it('produces a standalone print-friendly HTML document', async () => {
+    const datamodel = /* Prisma */ `
+      model Post {
+        id    String @id @default(cuid())
+        title String
+        @@map("posts")
+      }
+    `;
+    const dmmf = await getDMMF({ datamodel });
+    const dict = new DataDictionaryGenerator(
+      transformDMMF(dmmf, { includeRelationFields: true })
+    );
+    const html = dict.toStandaloneHTML();
+    expect(html).toMatch(/^<!DOCTYPE html>/);
+    expect(html).toContain('<title>Data Dictionary</title>');
+    expect(html).toContain('>posts<');
+    // No sidebar / model details content should leak in:
+    expect(html).not.toContain('sticky');
+    expect(html).not.toContain('Model Details');
   });
 });

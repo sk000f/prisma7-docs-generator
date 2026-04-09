@@ -2,7 +2,7 @@ import { Generatable, capitalize } from './helpers';
 import { DMMF } from '@prisma/generator-helper';
 import { DMMFDocument, DMMFMapping } from './transformDMMF';
 import * as Prism from 'prismjs';
-import { lowerCase, isScalarType } from './helpers';
+import { lowerCase } from './helpers';
 
 type ModelGeneratorStructure = {
   models: MGModel[];
@@ -99,11 +99,7 @@ export default class ModelGenerator
        ${field.name} 
       </td>
       <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">
-       ${
-         isScalarType(field.bareTypeName)
-           ? field.type
-           : `<a href="#type-outputType-${field.bareTypeName}">${field.type}</a>`
-       }
+       ${field.type}
       </td>
       <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">
         <ul class="text-black dark:text-white">
@@ -162,13 +158,7 @@ export default class ModelGenerator
                         </td>
                         <td class="px-4 py-2 border dark:text-white dark:border-gray-400">
                         ${opK.types
-                          .map((t) =>
-                            isScalarType(t.type as string)
-                              ? t.type
-                              : `<a href="#type-inputType-${t.type}" class="dark:text-white">${t.type}${
-                                  t.isList ? '[]' : ''
-                                }</a>`
-                          )
+                          .map((t) => `${t.type}${t.isList ? '[]' : ''}`)
                           .join(' | ')}
                         </td>
                         <td class="px-4 py-2 border dark:text-white dark:border-gray-400">
@@ -181,9 +171,7 @@ export default class ModelGenerator
                     </tbody>
                   </table>
                   <h4 class="text-lg mb-2 text-black dark:text-white">Output</h4>
-                  <div class="text-dark dark:text-white"><strong>Type: </strong> <a href="#type-outputType-${
-                    operation.output.type
-                  }">${operation.output.type}</a></div>
+                  <div class="text-dark dark:text-white"><strong>Type: </strong> ${operation.output.type}</div>
                   <div class="text-dark dark:text-white"><strong>Required: </strong>
                   ${operation.output.required ? `Yes` : `No`}</div>
                   <div class="text-dark dark:text-white"><strong>List: </strong>

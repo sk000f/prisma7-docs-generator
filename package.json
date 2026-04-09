@@ -1,6 +1,6 @@
 {
   "name": "prisma7-docs-generator",
-  "version": "7.0.2",
+  "version": "7.0.3",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
@@ -45,6 +45,7 @@
     "meow": "9",
     "pluralize": "^8.0.0",
     "prismjs": "^1.29.0",
+    "puppeteer": "^24.40.0",
     "ts-toolbelt": "^9.6.0"
   },
   "devDependencies": {

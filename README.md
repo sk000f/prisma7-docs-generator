@@ -8,13 +8,24 @@ Automatically generate an interactive HTML reference from your Prisma Schema. Th
 
 ## What's in the generated docs
 
-Each generated `index.html` contains three top-level sections, linked from a sticky sidebar table of contents:
+Each run of `prisma generate` produces the following files in the output directory:
 
-1. **Data Dictionary** — a compact, reference-card view of every model and field, with both Prisma (logical) and database (physical) names in separate columns. This is where you go to answer questions like "what's the column name in the database for `User.createdAt`?" without being distracted by CRUD operations. Models that use `@@map` show their physical table name as a muted suffix in the heading (e.g. `Post → posts`); fields with `@map` show their column name in a dedicated `Column` column. Non-scalar field types are hyperlinked to the Types section.
-2. **Model Details** — the full per-model view: documentation comments, `@@id`/`@@unique`/`@@index` directives, the same field listing as the dictionary (in the original five-column format), and every Prisma Client operation (`findUnique`, `findMany`, `create`, `update`, `upsert`, `delete`, `updateMany`, `deleteMany`, …) with usage snippets and input/output argument tables. This is where you go when you want to understand both the shape of a model *and* how to interact with it through Prisma Client.
-3. **Types** — Prisma Client's generated input and output types (e.g. `UserWhereInput`, `UserCreateInput`), cross-linked from the field and operation tables above.
+- `index.html` — the main documentation page (interactive, with dark mode)
+- `styles/main.css` — Tailwind-based stylesheet used by `index.html`
+- `data-dictionary.pdf` — a printable PDF of just the Data Dictionary, generated via headless Chromium
 
-The sidebar TOC mirrors these three sections so you can jump straight to a specific model, field, operation, or type.
+`index.html` contains two top-level sections, linked from a sticky sidebar table of contents:
+
+1. **Data Dictionary** — a compact, database-centric reference of every table and column. Physical names are used throughout: if a model has `@@map("posts")` it appears as `posts`; if a field has `@map("author_id")` it appears as `author_id`. When no `@@map`/`@map` is set, Prisma's logical names are used as the fallback. Each model gets a four-column table: Column, Type, Required, Description. No operations, no Prisma Client boilerplate — just the shape of the data as the database sees it.
+2. **Model Details** — the full Prisma-centric per-model view using the schema's logical names: documentation comments, `@@id`/`@@unique`/`@@index` directives, a five-column field table (Name, Type, Attributes, Required, Comment), and every Prisma Client operation (`findUnique`, `findMany`, `create`, `update`, `upsert`, `delete`, `updateMany`, `deleteMany`, …) with usage snippets and input/output argument tables. This is where you go when you want to understand how to interact with a model through Prisma Client.
+
+The sidebar TOC mirrors these two sections. Under each heading it lists only the tables (by physical name for Data Dictionary, by Prisma model name for Model Details) — field and operation sublists have been deliberately omitted to keep the navigation scannable for real-world schemas with dozens of models.
+
+### The PDF
+
+`data-dictionary.pdf` is a standalone, print-friendly rendering of just the Data Dictionary — no sidebar, no Model Details, no styling from the main page. It's generated during `prisma generate` by handing a print-optimised HTML document to headless Chromium (via [Puppeteer](https://pptr.dev/)), so it comes out ready to share with a DBA, email to a stakeholder, or drop into a wiki without needing to open a browser.
+
+PDF generation is **best-effort**: if Puppeteer fails to launch (e.g. no bundled Chromium, sandboxed CI, missing system libraries), the generator logs a warning and continues — you still get `index.html`, you just don't get the PDF. See [Troubleshooting](#troubleshooting).
 
 ## Requirements
 
@@ -162,11 +173,30 @@ console.error('models length:', options.dmmf?.datamodel?.models?.length);
 
 If it logs `0`, this is the issue and the `schema:` fix above will resolve it. If it logs a non-zero number, the crash is from something else and is worth opening an issue with the output of that log line.
 
+### `data-dictionary.pdf` is missing after `prisma generate`
+
+**Symptom:** `index.html` is generated but `data-dictionary.pdf` is not present, and the `prisma generate` output contains a line like:
+
+```
+prisma7-docs-generator: failed to generate data-dictionary.pdf: Failed to launch the browser process!
+```
+
+**Cause:** PDF output is produced by headless Chromium via Puppeteer. Puppeteer downloads Chromium into `~/.cache/puppeteer` the first time it's installed, and launches it with `--no-sandbox`. Common failure modes:
+
+- **Chromium was never downloaded** — e.g. because the install happened in an environment that set `PUPPETEER_SKIP_DOWNLOAD=true`, or the download was interrupted. Fix: `npx puppeteer browsers install chrome`.
+- **Missing system libraries on Linux** — headless Chromium needs a handful of shared objects (`libnss3`, `libatk-1.0`, `libcups2`, etc.). On Debian/Ubuntu: `apt-get install -y libnss3 libatk-bridge2.0-0 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxrandr2 libgbm1 libasound2`.
+- **Sandboxed CI/CD environment** — some CI runners block the sandbox. We already launch with `--no-sandbox`, so this is usually fine, but certain locked-down containers still refuse. In that case, fall back to opening `index.html` in a real browser and using File → Print → Save as PDF.
+
+PDF generation is best-effort by design — any failure logs a warning and the rest of the generator keeps working, so your HTML docs are always up to date regardless of whether the PDF succeeds.
+
 ## What changed in the Prisma 7 fork
 
 Compared to the original upstream package (which targeted Prisma 4.14), this fork contains the following changes needed to work with Prisma ORM 7, plus a couple of small feature additions:
 
-- **New Data Dictionary section** (feature add) — a dedicated top-level section that lists every model and field with both logical (Prisma) and physical (database) names side-by-side, surfacing `@@map` and `@map` values that the upstream package never displayed. Appears above the existing (renamed) "Model Details" section.
+- **New Data Dictionary section** (feature add) — a dedicated top-level section that lists every table and column using the **physical database names** (`@@map` / `@map` values from the schema, falling back to Prisma logical names when no mapping is set). Appears above the existing "Model Details" section, which retains the Prisma-centric logical view.
+- **PDF output** (feature add) — `prisma generate` now also emits `data-dictionary.pdf`, a standalone print-friendly rendering of the dictionary produced via headless Chromium (Puppeteer). Best-effort: falls back to HTML-only output if Puppeteer can't launch.
+- **Types section removed** — the upstream "Input Types" / "Output Types" reference has been dropped in favor of a cleaner two-section layout (Data Dictionary + Model Details). The field and operation tables in Model Details no longer hyperlink to type pages.
+- **Simplified TOC** — the sidebar now lists only the top-level tables under each section. The upstream TOC also listed every field and every operation per model, which became unusable on schemas with dozens of models.
 - **DMMF types are now `ReadonlyDeep`** (via the new `@prisma/dmmf` package). `transformDMMF` no longer mutates the incoming DMMF in place — it builds a fresh document when filtering out relation fields.
 - **`DMMF.SchemaArgInputType` was renamed to `DMMF.InputTypeRef`.** The `model.ts` and `apitypes.ts` generators were updated accordingly.
 - **`DMMF.ModelAction` is no longer exported as a runtime enum** from `@prisma/generator-helper`. The switch in `model.ts` now uses string literals (`'create'`, `'findUnique'`, …), which are the canonical v7 operation names.

@@ -4,76 +4,52 @@ import transformDMMF from '../generator/transformDMMF';
 
 const datamodel = /* Prisma */ `
   model Post {
-    id String @id @default(cuid())
+    id   String @id @default(cuid())
     name String
-    @@index([name])
+    @@map("posts")
   }
 
   model User {
-    userId String @id @default(cuid())
+    userId    String @id @default(cuid())
     something String
   }
 `;
 
 describe('TOC', () => {
-  it('renders TOC Subheader correctly', async () => {
+  it('lists physical table names under Data Dictionary and logical model names under Model Details', async () => {
     const dmmf = await getDMMF({ datamodel });
     const toc = new TOCGenerator(
-      transformDMMF(dmmf, {
-        includeRelationFields: true,
-      })
+      transformDMMF(dmmf, { includeRelationFields: true })
     );
-    const spy = jest.spyOn(toc, 'getTOCSubHeaderHTML');
-    // trigger the function
-    toc.toHTML();
-    expect(spy).toHaveBeenCalledTimes(2);
-    expect(spy).toHaveBeenCalledWith('Post');
-    expect(spy).toHaveBeenCalledWith('User');
-    expect(toc.getTOCSubHeaderHTML('Post')).toMatchSnapshot();
+
+    // Data structure
+    expect(toc.data.dictionary).toEqual(['posts', 'User']);
+    expect(toc.data.models).toEqual(['Post', 'User']);
+
+    // Rendered HTML
+    const html = toc.toHTML();
+    expect(html).toContain('href="#data-dictionary"');
+    expect(html).toContain('href="#dict-posts"');
+    expect(html).toContain('href="#dict-User"');
+    expect(html).toContain('href="#models"');
+    expect(html).toContain('href="#model-Post"');
+    expect(html).toContain('href="#model-User"');
+
+    // No fields, operations, or Types sublists should appear anymore
+    expect(html).not.toContain('#model-Post-id');
+    expect(html).not.toContain('#model-Post-findUnique');
+    expect(html).not.toContain('#types');
+    expect(html).not.toContain('Input Types');
+    expect(html).not.toContain('Output Types');
   });
 
-  it('renders TOC subfield correctly', async () => {
+  it('renders each top-level heading label', async () => {
     const dmmf = await getDMMF({ datamodel });
     const toc = new TOCGenerator(
-      transformDMMF(dmmf, {
-        includeRelationFields: true,
-      })
+      transformDMMF(dmmf, { includeRelationFields: true })
     );
-
-    const spy = jest.spyOn(toc, 'getSubFieldHTML');
-    toc.toHTML();
-
-    expect(spy).toHaveBeenCalled();
-    // every case of model name and one case of others
-    expect(spy).toHaveBeenCalledWith('model', 'Post', 'id');
-    expect(spy).toHaveBeenCalledWith('model', 'Post', 'name');
-    expect(spy).toHaveBeenCalledWith('model', 'User', 'userId');
-    expect(spy).toHaveBeenCalledWith('model', 'User', 'something');
-    expect(spy).toHaveBeenCalledWith('model', 'User', 'findUnique');
-    expect(spy).toHaveBeenCalledWith('dict', 'Post', 'id');
-    expect(spy).toHaveBeenCalledWith('dict', 'User', 'userId');
-    expect(spy).toHaveBeenCalledWith('type', 'inputType', 'UserWhereInput');
-    expect(spy).toHaveBeenCalledWith('type', 'outputType', 'User');
-
-    expect(toc.getSubFieldHTML('model', 'Post', 'userId')).toMatchSnapshot();
-  });
-
-  it('renders on toHTML', async () => {
-    const dmmf = await getDMMF({ datamodel });
-    const toc = new TOCGenerator(
-      transformDMMF(dmmf, {
-        includeRelationFields: true,
-      })
-    );
-
-    const subheaderSpy = jest.spyOn(toc, 'getTOCSubHeaderHTML');
-    const subfieldSpy = jest.spyOn(toc, 'getSubFieldHTML');
-    const result = toc.toHTML();
-
-    // one case of each just to make sure code calls them
-    expect(subheaderSpy).toHaveBeenCalledWith('Post');
-    expect(subfieldSpy).toHaveBeenCalledWith('model', 'Post', 'id');
-
-    expect(result).toMatchSnapshot();
+    const html = toc.toHTML();
+    expect(html).toContain('>Data Dictionary<');
+    expect(html).toContain('>Model Details<');
   });
 });
