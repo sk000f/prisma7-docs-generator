@@ -1,34 +1,41 @@
 {
-  "name": "prisma-docs-generator",
-  "version": "0.8.0",
+  "name": "prisma7-docs-generator",
+  "version": "7.0.1",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
-    "prisma-docs-generator": "dist/cli.js"
+    "prisma7-docs-generator": "dist/cli.js"
   },
-  "description": "Documentation reference generator for Prisma Schema",
-  "author": {
-    "name": "Harshit Pant",
-    "email": "pantharshit00@gmail.com",
-    "url": "https://harshitpant.com"
-  },
+  "description": "Documentation reference generator for Prisma 7 schemas (fork of prisma-docs-generator, updated for Prisma ORM 7 and multi-file schemas)",
+  "author": "Mike Skaife <mike.skaife@gmail.com>",
+  "contributors": [
+    "Harshit Pant <pantharshit00@gmail.com> (https://harshitpant.com)"
+  ],
   "keywords": [
-    "prisma2",
     "prisma",
+    "prisma7",
     "prisma-generator",
     "prisma-schema",
     "code-generation",
     "docs",
     "reference"
   ],
-  "homepage": "https://github.com/pantharshit00/prisma-docs-generator",
+  "homepage": "https://github.com/sk000f/prisma7-docs-generator",
   "repository": {
-    "url": "git@github.com:pantharshit00/prisma-docs-generator.git"
+    "type": "git",
+    "url": "git+https://github.com/sk000f/prisma7-docs-generator.git"
   },
   "bugs": {
-    "email": "pantharshit00@gmail.com",
-    "url": "https://github.com/pantharshit00/prisma-docs-generator/issues"
+    "url": "https://github.com/sk000f/prisma7-docs-generator/issues"
   },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {
     "@prisma/generator-helper": "^7.7.0",
     "@prisma/internals": "^7.7.0",
@@ -62,6 +69,7 @@
     "build:styles": "cd styles_generator && yarn build && cpy --flat ./dist/main.css ../src/styles/",
     "build": "yarn build:styles && yarn build:gen",
     "test": "jest",
-    "format": "prettier --ignore-path .gitignore src/**/*.ts --write"
+    "format": "prettier --ignore-path .gitignore src/**/*.ts --write",
+    "prepublishOnly": "yarn clean && yarn build && yarn test"
   }
 }

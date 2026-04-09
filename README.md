@@ -18,18 +18,18 @@ If you are still on Prisma 4–6, use the original upstream package — this for
 1. Install this package as a dev dependency:
 
    ```shell
-   npm install -D prisma-docs-generator
+   npm install -D prisma7-docs-generator
    # or
-   pnpm add -D prisma-docs-generator
+   pnpm add -D prisma7-docs-generator
    # or
-   yarn add -D prisma-docs-generator
+   yarn add -D prisma7-docs-generator
    ```
 
 2. Add the generator to your schema:
 
    ```prisma
    generator docs {
-     provider = "node node_modules/prisma-docs-generator"
+     provider = "node node_modules/prisma7-docs-generator"
      output   = "../docs"
    }
    ```
@@ -41,7 +41,7 @@ If you are still on Prisma 4–6, use the original upstream package — this for
 4. Serve the docs locally:
 
    ```shell
-   npx prisma-docs-generator serve
+   npx prisma7-docs-generator serve
    ```
 
 ## Multi-file schemas (`prismaSchemaFolder`)
@@ -62,7 +62,7 @@ Generate and serve with:
 
 ```shell
 npx prisma generate --schema=prisma/schema
-npx prisma-docs-generator serve --schema=prisma/schema
+npx prisma7-docs-generator serve --schema=prisma/schema
 ```
 
 If you have a `prisma.config.ts` that configures the schema path, both commands will pick it up automatically. The `serve` CLI also falls back to `./prisma/schema` if the default single-file locations aren't found, so in most projects no `--schema` flag is needed.
@@ -75,7 +75,7 @@ Where the generated HTML and CSS will be written. Resolved relative to the schem
 
 ```prisma
 generator docs {
-  provider = "node node_modules/prisma-docs-generator"
+  provider = "node node_modules/prisma7-docs-generator"
   output   = "../docs"
 }
 ```
@@ -86,7 +86,7 @@ Whether to render relation fields in model tables. Default: `true`.
 
 ```prisma
 generator docs {
-  provider              = "node node_modules/prisma-docs-generator"
+  provider              = "node node_modules/prisma7-docs-generator"
   output                = "../docs"
   includeRelationFields = "false"
 }
@@ -101,7 +101,7 @@ This package ships a small CLI with a single subcommand today:
 Serves the static HTML that the generator wrote to its `output` path.
 
 ```
-prisma-docs-generator serve [flags]
+prisma7-docs-generator serve [flags]
 
   --port, -p      Port for the express server (default: 5858)
   --schema        Path to the Prisma schema file or multi-file schema folder
@@ -111,6 +111,46 @@ prisma-docs-generator serve [flags]
 ```
 
 Under the hood, `serve` reads the generator's output path straight from the schema context rather than spawning all configured generators — so it will not try to re-run Prisma's built-in `prisma-client` generator when you just want to view docs.
+
+## Troubleshooting
+
+### `Cannot read properties of undefined (reading 'map')` with a multi-file schema
+
+**Symptom:** `prisma generate` fails with an error like:
+
+```
+✔ Generated Prisma Client (7.x.x) to ./src/generated/prisma in 12ms
+
+Cannot read properties of undefined (reading 'map')
+```
+
+The Prisma client generator runs successfully, but `prisma7-docs-generator` crashes immediately afterwards. Confusingly, no stack trace from the generator itself is shown.
+
+**Cause:** If you're using Prisma's multi-file schema layout (a primary `schema.prisma` plus model definitions split across `prisma/models/*.prisma`), and you don't have an explicit `schema` entry in your `prisma.config.ts`, Prisma 7 will pass an empty datamodel (`datamodel.models.length === 0`) to third-party generators. The built-in `prisma-client` generator has its own multi-file discovery path, so it works regardless — but external generators, including this one, receive only the primary file, which typically contains nothing but `generator` and `datasource` blocks.
+
+When this generator then tries to render docs from an empty model list, an internal `.map(...)` call fails on a downstream field that was expected to be populated from the datamodel.
+
+**Fix:** Add an explicit `schema` entry to your `prisma.config.ts` pointing at the folder (or file) containing your schema:
+
+```ts
+// prisma.config.ts
+import { defineConfig } from 'prisma/config';
+
+export default defineConfig({
+  schema: './prisma', // <-- add this line
+  // ... rest of your config
+});
+```
+
+After this change, Prisma will treat the whole `prisma/` folder as the schema source for all consumers (client + third-party generators), and the full datamodel will be passed through correctly.
+
+**How to confirm this is your issue:** If you're unsure whether you're hitting the empty-datamodel case, you can check quickly by temporarily patching `node_modules/prisma7-docs-generator/dist/index.js` at the top of `onGenerate` with:
+
+```js
+console.error('models length:', options.dmmf?.datamodel?.models?.length);
+```
+
+If it logs `0`, this is the issue and the `schema:` fix above will resolve it. If it logs a non-zero number, the crash is from something else and is worth opening an issue with the output of that log line.
 
 ## What changed in the Prisma 7 fork
 
