@@ -63,7 +63,44 @@
         </div>
         
         <div>
-          <h5 class="mb-2 font-bold dark:text-white"><a href="#models">Models</a></h5>
+          <h5 class="mb-2 font-bold dark:text-white"><a href="#data-dictionary">Data Dictionary</a></h5>
+          <ul class="mb-2 ml-1">
+              
+            <li class="mb-4">
+                
+    <div class="font-semibold text-gray-700 dark:text-white">
+      <a href="#dict-Post">Post</a>
+    </div>
+   
+                <ul class="pl-3 mt-1 ml-3 border-l-2 border-gray-400 dark:text-white">
+                <li><a href="#dict-Post-id" class="dark:text-white">id</a></li><li><a href="#dict-Post-createdAt" class="dark:text-white">createdAt</a></li><li><a href="#dict-Post-title" class="dark:text-white">title</a></li><li><a href="#dict-Post-content" class="dark:text-white">content</a></li><li><a href="#dict-Post-published" class="dark:text-white">published</a></li><li><a href="#dict-Post-author" class="dark:text-white">author</a></li><li><a href="#dict-Post-authorId" class="dark:text-white">authorId</a></li>
+                </ul>
+            </li>
+              
+            <li class="mb-4">
+                
+    <div class="font-semibold text-gray-700 dark:text-white">
+      <a href="#dict-User">User</a>
+    </div>
+   
+                <ul class="pl-3 mt-1 ml-3 border-l-2 border-gray-400 dark:text-white">
+                <li><a href="#dict-User-id" class="dark:text-white">id</a></li><li><a href="#dict-User-email" class="dark:text-white">email</a></li><li><a href="#dict-User-name" class="dark:text-white">name</a></li><li><a href="#dict-User-posts" class="dark:text-white">posts</a></li><li><a href="#dict-User-profile" class="dark:text-white">profile</a></li><li><a href="#dict-User-arrayField" class="dark:text-white">arrayField</a></li>
+                </ul>
+            </li>
+              
+            <li class="mb-4">
+                
+    <div class="font-semibold text-gray-700 dark:text-white">
+      <a href="#dict-Profile">Profile</a>
+    </div>
+   
+                <ul class="pl-3 mt-1 ml-3 border-l-2 border-gray-400 dark:text-white">
+                <li><a href="#dict-Profile-id" class="dark:text-white">id</a></li><li><a href="#dict-Profile-bio" class="dark:text-white">bio</a></li><li><a href="#dict-Profile-user" class="dark:text-white">user</a></li><li><a href="#dict-Profile-userId" class="dark:text-white">userId</a></li>
+                </ul>
+            </li>
+              
+          </ul>
+          <h5 class="mt-12 mb-2 font-bold dark:text-white"><a href="#models">Model Details</a></h5>
           <ul class="mb-2 ml-1">
               
             <li class="mb-4">
@@ -151,8 +188,216 @@
       </div>
       <div class="w-full p-4 bg-white overflow-x-hidden dark:bg-gray-800">
         
+      <div class="mb-12">
+        <h1 class="text-3xl text-gray-800 dark:text-white" id="data-dictionary">Data Dictionary</h1>
+        <p class="px-4 mt-2 mb-4 text-gray-700 dark:text-gray-300">
+          Reference of every model and field with both Prisma (logical) and database (physical) names.
+        </p>
+        
+      <div class="px-4 mb-6">
+        <h2 class="mt-8 mb-2 text-2xl text-black dark:text-white" id="dict-Post">Post <span class="text-base text-gray-500 dark:text-gray-400">&rarr; posts</span></h2>
+        <div class="mb-2 text-black dark:text-white">this is</div>
+        <div class="px-2 mb-4">
+          <table class="table-auto">
+            <thead>
+              <tr>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Field</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Column</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Type</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Required</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+      <tr id="dict-Post-id">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">id</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">id</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Int</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">this is id for the post</td>
+      </tr>
+    
+      <tr id="dict-Post-createdAt">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">createdAt</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">createdAt</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">DateTime</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Post-title">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">title</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">title</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">String</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Post-content">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">content</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">content</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">String?</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">No</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Post-published">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">published</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">published</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Boolean</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Post-author">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">author</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">author</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><a href="#type-outputType-User" class="dark:text-white">User</a></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Post-authorId">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">authorId</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">author_id</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Int</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="px-4 mb-6">
+        <h2 class="mt-8 mb-2 text-2xl text-black dark:text-white" id="dict-User">User</h2>
+        
+        <div class="px-2 mb-4">
+          <table class="table-auto">
+            <thead>
+              <tr>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Field</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Column</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Type</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Required</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+      <tr id="dict-User-id">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">id</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">id</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Int</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-User-email">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">email</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">email</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">String</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-User-name">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">name</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">name</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">String?</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">No</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-User-posts">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">posts</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">posts</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><a href="#type-outputType-Post" class="dark:text-white">Post[]</a></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-User-profile">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">profile</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">profile</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><a href="#type-outputType-Profile" class="dark:text-white">Profile?</a></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">No</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-User-arrayField">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">arrayField</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">arrayField</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">String[]</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      <div class="px-4 mb-6">
+        <h2 class="mt-8 mb-2 text-2xl text-black dark:text-white" id="dict-Profile">Profile</h2>
+        
+        <div class="px-2 mb-4">
+          <table class="table-auto">
+            <thead>
+              <tr>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Field</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Column</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Type</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Required</th>
+                <th class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              
+      <tr id="dict-Profile-id">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">id</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">id</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Int</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Profile-bio">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">bio</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">bio</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">String?</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">No</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Profile-user">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">user</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">user</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><a href="#type-outputType-User" class="dark:text-white">User</a></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+      <tr id="dict-Profile-userId">
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">userId</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">userId</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">Int</td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400"><strong>Yes</strong></td>
+        <td class="px-4 py-2 border text-black dark:text-white dark:border-gray-400">-</td>
+      </tr>
+    
+            </tbody>
+          </table>
+        </div>
+      </div>
+    
+      </div>
+    
+        
         <div class="mb-8">
-          <h1 class="text-3xl text-gray-800 dark:text-white" id="models">Models</h1>
+          <h1 class="text-3xl text-gray-800 dark:text-white" id="models">Model Details</h1>
             
             <div class="px-4 mb-4">
               <h2 class="text-2xl text-black dark:text-white" id="model-Post">Post</h2>

@@ -6,6 +6,16 @@ Automatically generate an interactive HTML reference from your Prisma Schema. Th
 
 > This is a fork of the original [`prisma-docs-generator`](https://github.com/pantharshit00/prisma-docs-generator) updated for **Prisma ORM 7**. The upstream project has not been maintained since Prisma 4, and Prisma's DMMF, generator APIs, and schema loader changed significantly in versions 5–7. See [What changed in the Prisma 7 fork](#what-changed-in-the-prisma-7-fork) below for details.
 
+## What's in the generated docs
+
+Each generated `index.html` contains three top-level sections, linked from a sticky sidebar table of contents:
+
+1. **Data Dictionary** — a compact, reference-card view of every model and field, with both Prisma (logical) and database (physical) names in separate columns. This is where you go to answer questions like "what's the column name in the database for `User.createdAt`?" without being distracted by CRUD operations. Models that use `@@map` show their physical table name as a muted suffix in the heading (e.g. `Post → posts`); fields with `@map` show their column name in a dedicated `Column` column. Non-scalar field types are hyperlinked to the Types section.
+2. **Model Details** — the full per-model view: documentation comments, `@@id`/`@@unique`/`@@index` directives, the same field listing as the dictionary (in the original five-column format), and every Prisma Client operation (`findUnique`, `findMany`, `create`, `update`, `upsert`, `delete`, `updateMany`, `deleteMany`, …) with usage snippets and input/output argument tables. This is where you go when you want to understand both the shape of a model *and* how to interact with it through Prisma Client.
+3. **Types** — Prisma Client's generated input and output types (e.g. `UserWhereInput`, `UserCreateInput`), cross-linked from the field and operation tables above.
+
+The sidebar TOC mirrors these three sections so you can jump straight to a specific model, field, operation, or type.
+
 ## Requirements
 
 - **Prisma ORM 7.x** (`prisma`, `@prisma/client`, `@prisma/generator-helper`, `@prisma/internals` all on `^7.7.0`).
@@ -154,8 +164,9 @@ If it logs `0`, this is the issue and the `schema:` fix above will resolve it. I
 
 ## What changed in the Prisma 7 fork
 
-Compared to the original upstream package (which targeted Prisma 4.14), this fork contains the following changes needed to work with Prisma ORM 7:
+Compared to the original upstream package (which targeted Prisma 4.14), this fork contains the following changes needed to work with Prisma ORM 7, plus a couple of small feature additions:
 
+- **New Data Dictionary section** (feature add) — a dedicated top-level section that lists every model and field with both logical (Prisma) and physical (database) names side-by-side, surfacing `@@map` and `@map` values that the upstream package never displayed. Appears above the existing (renamed) "Model Details" section.
 - **DMMF types are now `ReadonlyDeep`** (via the new `@prisma/dmmf` package). `transformDMMF` no longer mutates the incoming DMMF in place — it builds a fresh document when filtering out relation fields.
 - **`DMMF.SchemaArgInputType` was renamed to `DMMF.InputTypeRef`.** The `model.ts` and `apitypes.ts` generators were updated accordingly.
 - **`DMMF.ModelAction` is no longer exported as a runtime enum** from `@prisma/generator-helper`. The switch in `model.ts` now uses string literals (`'create'`, `'findUnique'`, …), which are the canonical v7 operation names.

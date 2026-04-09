@@ -3,6 +3,7 @@ import { Generatable } from '../generator/helpers';
 import TOCGenerator from '../generator/toc';
 import ModelGenerator from '../generator/model';
 import TypesGenerator from '../generator/apitypes';
+import DataDictionaryGenerator from '../generator/datadictionary';
 import { DMMFDocument } from '../generator/transformDMMF';
 
 export default class HTMLPrinter implements Generatable<DMMFDocument> {
@@ -80,6 +81,7 @@ export default class HTMLPrinter implements Generatable<DMMFDocument> {
   toHTML() {
     // all the printers
     const tocGen = new TOCGenerator(this.data);
+    const dictGen = new DataDictionaryGenerator(this.data);
     const modelGen = new ModelGenerator(this.data);
     const typeGen = new TypesGenerator(this.data);
 
@@ -101,6 +103,7 @@ export default class HTMLPrinter implements Generatable<DMMFDocument> {
         ${tocGen.toHTML()}
       </div>
       <div class="w-full p-4 bg-white overflow-x-hidden dark:bg-gray-800">
+        ${dictGen.toHTML()}
         ${modelGen.toHTML()}
         ${typeGen.toHTML()}
       </div>

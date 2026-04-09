@@ -197,7 +197,7 @@ export default class ModelGenerator
 
     return `
         <div class="mb-8">
-          <h1 class="text-3xl text-gray-800 dark:text-white" id="models">Models</h1>
+          <h1 class="text-3xl text-gray-800 dark:text-white" id="models">Model Details</h1>
             ${this.data.models
               .map(
                 (model) => `

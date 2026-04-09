@@ -3,8 +3,14 @@ import { DMMF } from '@prisma/generator-helper';
 import { DMMFDocument, DMMFMapping } from './transformDMMF';
 
 type TOCStructure = {
+  dictionary: TOCDictionaryModel[];
   models: TOCModel[];
   types: TOCTypes;
+};
+
+type TOCDictionaryModel = {
+  name: string;
+  fields: string[];
 };
 
 type TOCModel = {
@@ -37,10 +43,37 @@ export default class TOCGenerator implements Generatable<TOCStructure> {
     return `<li><a href="#${identifier}-${root}-${field}" class="dark:text-white">${field}</a></li>`;
   }
 
+  getDictionaryEntryHTML(name: string): string {
+    return `
+    <div class="font-semibold text-gray-700 dark:text-white">
+      <a href="#dict-${name}">${name}</a>
+    </div>
+   `;
+  }
+
   toHTML() {
     return `
         <div>
-          <h5 class="mb-2 font-bold dark:text-white"><a href="#models">Models</a></h5>
+          <h5 class="mb-2 font-bold dark:text-white"><a href="#data-dictionary">Data Dictionary</a></h5>
+          <ul class="mb-2 ml-1">
+              ${this.data.dictionary
+                .map(
+                  (model) => `
+            <li class="mb-4">
+                ${this.getDictionaryEntryHTML(model.name)}
+                <ul class="pl-3 mt-1 ml-3 border-l-2 border-gray-400 dark:text-white">
+                ${model.fields
+                  .map((field) =>
+                    this.getSubFieldHTML('dict', model.name, field)
+                  )
+                  .join('')}
+                </ul>
+            </li>
+              `
+                )
+                .join('')}
+          </ul>
+          <h5 class="mt-12 mb-2 font-bold dark:text-white"><a href="#models">Model Details</a></h5>
           <ul class="mb-2 ml-1">
               ${this.data.models
                 .map(
@@ -133,8 +166,18 @@ export default class TOCGenerator implements Generatable<TOCStructure> {
     };
   }
 
+  getDictionary(
+    dmmfModel: readonly DMMF.Model[]
+  ): TOCDictionaryModel[] {
+    return dmmfModel.map((model) => ({
+      name: model.name,
+      fields: model.fields.map((field) => field.name),
+    }));
+  }
+
   getData(d: DMMFDocument) {
     return {
+      dictionary: this.getDictionary(d.datamodel.models),
       models: this.getModels(d.datamodel.models, d.mappings),
       types: this.getTypes(d.schema),
     };
