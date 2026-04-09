@@ -1,6 +1,6 @@
 {
   "name": "prisma7-docs-generator",
-  "version": "7.0.1",
+  "version": "7.0.2",
   "main": "dist/index.js",
   "license": "MIT",
   "bin": {
