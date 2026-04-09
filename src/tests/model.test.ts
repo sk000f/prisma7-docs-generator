@@ -1,14 +1,12 @@
 import ModelGenerator from '../generator/model';
 import transformDMMF from '../generator/transformDMMF';
-//@ts-ignore
 import { getDMMF } from '@prisma/internals';
 
 describe('model generator', () => {
   it('renders model directive html correctly', async () => {
     const datamodelString = /* Prisma */ `
-      datasource postgres {
+      datasource db {
         provider = "postgresql"
-        url = env("DATABASE_URL")
       }
       model User {
         id String @default(cuid())
@@ -84,7 +82,8 @@ describe('model generator', () => {
         name: 'id',
         type: 'String',
         bareTypeName: 'String',
-        directives: ['@id', '@default(cuid())'],
+        directives: ['@id', '@default(cuid(1))'],
+        documentation: undefined,
         required: true,
       },
       'User'
@@ -108,6 +107,7 @@ describe('model generator', () => {
         type: 'String?',
         bareTypeName: 'String',
         directives: [],
+        documentation: undefined,
         required: false,
       },
       'Post'

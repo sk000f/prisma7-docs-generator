@@ -107,7 +107,7 @@ export default class TOCGenerator implements Generatable<TOCStructure> {
     `;
   }
 
-  getModels(dmmfModel: DMMF.Model[], mappings: DMMFMapping[]): TOCModel[] {
+  getModels(dmmfModel: readonly DMMF.Model[], mappings: DMMFMapping[]): TOCModel[] {
     return dmmfModel.map((model) => {
       return {
         name: model.name,
@@ -121,7 +121,7 @@ export default class TOCGenerator implements Generatable<TOCStructure> {
 
   getTypes(dmmfSchema: DMMF.Schema): TOCTypes {
     return {
-      inputTypes: dmmfSchema.inputObjectTypes.prisma.map(
+      inputTypes: (dmmfSchema.inputObjectTypes.prisma ?? []).map(
         (inputType) => inputType.name
       ),
       outputTypes: [

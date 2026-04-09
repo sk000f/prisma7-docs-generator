@@ -1,0 +1,13 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../../generated/client"
+}
+
+generator docs {
+  provider = "node ./dist/index.js"
+  output   = "../../docs"
+}
+
+datasource db {
+  provider = "postgresql"
+}

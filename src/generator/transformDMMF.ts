@@ -1,4 +1,4 @@
-import { DMMF as ExternalDMMF } from '@prisma/generator-helper';
+import type { DMMF as ExternalDMMF } from '@prisma/generator-helper';
 
 export function lowerCase(name: string): string {
   return name.substring(0, 1).toLowerCase() + name.substring(1);
@@ -6,7 +6,7 @@ export function lowerCase(name: string): string {
 
 export interface DMMFMapping {
   model: string;
-  findOne?: string | null;
+  findUnique?: string | null;
   findFirst?: string | null;
   findMany?: string | null;
   create?: string | null;
@@ -22,25 +22,29 @@ export type DMMFDocument = Omit<ExternalDMMF.Document, 'mappings'> & {
 };
 
 type OptionsForTransformDMMF = {
-  includeRelationFields: boolean
-}
+  includeRelationFields: boolean;
+};
 
 export default function transformDMMF(
   dmmf: ExternalDMMF.Document,
   { includeRelationFields }: OptionsForTransformDMMF
 ): DMMFDocument {
-  if (!includeRelationFields) {
-    dmmf.datamodel.models = dmmf.datamodel.models.map(model => {
-      model.fields = model.fields.filter(
-        field => !field.relationName
-      );
-      return model;
-    });
-  }
+  // DMMF types are ReadonlyDeep in Prisma 7, so we must build new objects
+  // instead of mutating in place.
+  const datamodel: ExternalDMMF.Datamodel = includeRelationFields
+    ? dmmf.datamodel
+    : {
+        ...dmmf.datamodel,
+        models: dmmf.datamodel.models.map((model) => ({
+          ...model,
+          fields: model.fields.filter((field) => !field.relationName),
+        })),
+      };
 
   return {
     ...dmmf,
-    mappings: getMappings(dmmf.mappings, dmmf.datamodel),
+    datamodel,
+    mappings: getMappings(dmmf.mappings, datamodel),
   };
 }
 
@@ -48,7 +52,7 @@ function getMappings(
   mappings: ExternalDMMF.Mappings,
   datamodel: ExternalDMMF.Datamodel
 ): DMMFMapping[] {
-  const modelOperations = mappings.modelOperations
+  return mappings.modelOperations
     .filter((mapping) => {
       const model = datamodel.models.find((m) => m.name === mapping.model);
       if (!model) {
@@ -56,18 +60,16 @@ function getMappings(
       }
       return model.fields.some((f) => f.kind !== 'object');
     })
-    .map((mapping: any) => ({
+    .map((mapping) => ({
       model: mapping.model,
-      findUnique: mapping.findSingle || mapping.findOne || mapping.findUnique,
+      findUnique: mapping.findUnique,
       findFirst: mapping.findFirst,
       findMany: mapping.findMany,
-      create: mapping.createOne || mapping.createSingle || mapping.create,
-      delete: mapping.deleteOne || mapping.deleteSingle || mapping.delete,
-      update: mapping.updateOne || mapping.updateSingle || mapping.update,
-      deleteMany: mapping.deleteMany,
+      create: mapping.create,
+      update: mapping.update,
       updateMany: mapping.updateMany,
-      upsert: mapping.upsertOne || mapping.upsertSingle || mapping.upsert,
+      upsert: mapping.upsert,
+      delete: mapping.delete,
+      deleteMany: mapping.deleteMany,
     }));
-
-  return modelOperations;
 }

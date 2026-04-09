@@ -14,9 +14,15 @@ type TGType = {
   fields: TGTypeField[];
 };
 
+type TGTypeRef = {
+  isList: boolean;
+  type: string;
+  location: string;
+};
+
 type TGTypeField = {
   name: string;
-  type: DMMF.SchemaArgInputType[];
+  type: readonly TGTypeRef[];
   nullable: boolean;
 };
 
@@ -103,7 +109,7 @@ class TypesGenerator implements Generatable<TypesGeneratorStructure> {
 `;
   }
 
-  getInputTypes(dmmfInputType: DMMF.InputType[]): TGType[] {
+  getInputTypes(dmmfInputType: readonly DMMF.InputType[]): TGType[] {
     return dmmfInputType.map((inputType) => ({
       name: inputType.name,
       fields: inputType.fields.map((ip) => ({
@@ -114,13 +120,12 @@ class TypesGenerator implements Generatable<TypesGeneratorStructure> {
     }));
   }
 
-  getOutputTypes(dmmfOutputTypes: DMMF.OutputType[]): TGType[] {
+  getOutputTypes(dmmfOutputTypes: readonly DMMF.OutputType[]): TGType[] {
     return dmmfOutputTypes.map((outputType) => ({
       name: outputType.name,
       fields: outputType.fields.map((op) => ({
         name: op.name,
         nullable: !op.isNullable,
-        list: (op.outputType as any).isList,
         type: [
           {
             isList: op.outputType.isList,
@@ -134,7 +139,7 @@ class TypesGenerator implements Generatable<TypesGeneratorStructure> {
 
   getData(d: DMMFDocument) {
     return {
-      inputTypes: this.getInputTypes(d.schema.inputObjectTypes.prisma),
+      inputTypes: this.getInputTypes(d.schema.inputObjectTypes.prisma ?? []),
       outputTypes: this.getOutputTypes([
         ...d.schema.outputObjectTypes.model,
         ...d.schema.outputObjectTypes.prisma.filter(

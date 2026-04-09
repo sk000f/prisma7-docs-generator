@@ -1,5 +1,4 @@
 import transformDMMF from '../generator/transformDMMF';
-//@ts-ignore
 import { getDMMF } from '@prisma/internals';
 
 describe('transformDMMF', () => {
@@ -49,6 +48,41 @@ describe('transformDMMF', () => {
         ],
       },
     });
+  });
+
+  it('handles multi-file schema input (Prisma 7 prismaSchemaFolder)', async () => {
+    const userSchema = /* Prisma */ `
+      model User {
+        id String @id @default(cuid())
+        name String
+        posts Post[]
+      }
+    `;
+    const postSchema = /* Prisma */ `
+      model Post {
+        id String @id @default(cuid())
+        title String?
+        userId String
+        user User @relation(fields: [userId], references: [id])
+      }
+    `;
+
+    const dmmf = await getDMMF({
+      datamodel: [
+        ['/virtual/user.prisma', userSchema],
+        ['/virtual/post.prisma', postSchema],
+      ],
+    });
+    const transformed = transformDMMF(dmmf, { includeRelationFields: true });
+
+    expect(transformed.datamodel.models.map((m) => m.name).sort()).toEqual([
+      'Post',
+      'User',
+    ]);
+    expect(transformed.mappings.map((m) => m.model).sort()).toEqual([
+      'Post',
+      'User',
+    ]);
   });
 
   it('hide relation fields when includeRelationFields = false', async () => {

@@ -18,7 +18,7 @@ type MGModel = {
 
 type MGModelDirective = {
   name: string;
-  values: any[];
+  values: readonly string[];
 };
 
 type MGModelField = {
@@ -32,7 +32,7 @@ type MGModelField = {
 
 type MGModelOperationKeys = {
   name: string;
-  types: DMMF.SchemaArgInputType[];
+  types: readonly DMMF.InputTypeRef[];
   required: boolean;
 };
 
@@ -300,7 +300,7 @@ export default class ModelGenerator
         name: field.name,
         type: this.getFieldType(field),
         bareTypeName: field.type,
-        documentation: (field as any).documentation,
+        documentation: field.documentation,
         directives: this.getFieldDirectives(field),
         required: field.isRequired,
       };
@@ -377,7 +377,7 @@ export default class ModelGenerator
       const plural = capitalize(singular);
       const method = `prisma.${lowerCase(model.name)}.${op}`;
       switch (op) {
-        case DMMF.ModelAction.create: {
+        case 'create': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Mutation')
             ?.fields.find((f) => f.name === val);
@@ -408,7 +408,7 @@ const ${singular} = await ${method}({
           });
           break;
         }
-        case DMMF.ModelAction.deleteMany: {
+        case 'deleteMany': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Mutation')
             ?.fields.find((f) => f.name === val);
@@ -439,7 +439,7 @@ const { count } = await ${method}({
           });
           break;
         }
-        case DMMF.ModelAction.delete: {
+        case 'delete': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Mutation')
             ?.fields.find((f) => f.name === val);
@@ -469,7 +469,7 @@ const ${singular} = await ${method}({
           });
           break;
         }
-        case DMMF.ModelAction.findMany: {
+        case 'findMany': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Query')
             ?.fields.find((f) => f.name === val);
@@ -498,7 +498,7 @@ const ${plural} = await ${method}({ take: 10 })
           });
           break;
         }
-        case DMMF.ModelAction.findUnique: {
+        case 'findUnique': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Query')
             ?.fields.find((f) => f.name === val);
@@ -530,7 +530,7 @@ const ${lowerCase(singular)} = await ${method}({
           break;
         }
 
-        case DMMF.ModelAction.findFirst: {
+        case 'findFirst': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Query')
             ?.fields.find((f) => f.name === val);
@@ -562,7 +562,7 @@ const ${lowerCase(singular)} = await ${method}({
           break;
         }
 
-        case DMMF.ModelAction.update: {
+        case 'update': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Mutation')
             ?.fields.find((f) => f.name === val);
@@ -597,7 +597,7 @@ const ${lowerCase(singular)} = await ${method}({
           break;
         }
 
-        case DMMF.ModelAction.updateMany: {
+        case 'updateMany': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Mutation')
             ?.fields.find((f) => f.name === val);
@@ -629,7 +629,7 @@ const ${lowerCase(singular)} = await ${method}({
           });
           break;
         }
-        case DMMF.ModelAction.upsert: {
+        case 'upsert': {
           const field = schema.outputObjectTypes.prisma
             .find((t) => t.name === 'Mutation')
             ?.fields.find((f) => f.name === val);
@@ -674,7 +674,7 @@ const ${lowerCase(singular)} = await ${method}({
     return dmmf.datamodel.models.map((model) => {
       return {
         name: model.name,
-        documentation: (model as any).documentation as string, // TODO: Open issue for generator helper
+        documentation: model.documentation,
         directives: this.getModelDirective(model),
         fields: this.getModelFields(model),
         operations: this.getModelOperations(
